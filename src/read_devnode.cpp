@@ -46,9 +46,9 @@ void read_devnode(const char *devnode) {
             if (ev.type == EV_KEY && (ev.value == 0 || ev.value == 1)) {
                 xkb_keycode_t keycode = ev.code + 8; // Offset for EV_KEY
                 xkb_keysym_t sym = xkb_state_key_get_one_sym(state, keycode);
-
                 xkb_keysym_t unicode = xkb_keysym_to_utf32(sym);
-                
+
+                std::cout << "base key code: " <<  ev.code << std::endl; 
                 std::string status = ev.value == 0 ? "released" : "pressed";
                 if (unicode != XKB_KEY_NoSymbol) {
                     std::cout << "Key : "  << (char)unicode << " was " << status  << std::endl;
