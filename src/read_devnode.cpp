@@ -17,11 +17,13 @@ void read_devnode(const char *devnode) {
     
     while (true) {
         ssize_t bytesRead = read(fd, &ev, sizeof(struct input_event));
-        if (bytesRead == sizeof(struct input_event) && (ev.value == 0 || ev.value == 1)) {
-            if (ev.type == EV_KEY) {
-                if(map_code(ev.code, ev.value) == -1){
-                    break;
-                }
+        if (
+            bytesRead == sizeof(struct input_event) && 
+            ev.type == EV_KEY &&
+            (ev.value == 0 || ev.value == 1)
+        ) {
+            if(map_code(ev.code, ev.value)){
+                break;
             }
         }
     }

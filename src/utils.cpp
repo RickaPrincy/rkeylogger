@@ -6,7 +6,7 @@
 #include <iomanip>
 #include "rkeylogger.h"
 
-bool capsclock_status() {
+bool get_capsclock_status() {
     struct termios term;
     tcgetattr(STDIN_FILENO, &term);
     return (term.c_lflag & ECHO) != 0;
