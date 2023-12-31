@@ -1,1 +1,0 @@
-/usr/bin/g++ CMakeFiles/rkeylogger.dir/main.cpp.o CMakeFiles/rkeylogger.dir/read_devnode.cpp.o -o ../rkeylogger  -ludev -lxkbcommon 
