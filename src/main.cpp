@@ -26,6 +26,7 @@ int main() {
         const char *devnode = udev_device_get_devnode(dev);
         if (devnode && strstr(devnode, "event")) {
             std::cout << "[ KEYBOARD_EVENT_PATH ]: " << devnode << std::endl;
+            setLayout(Layout::QWERTY);
             read_devnode(devnode);
             break;
         }

