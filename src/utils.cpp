@@ -3,7 +3,7 @@
 #include <iomanip>
 #include "rkeylogger.h"
 
-std::string current_datetime(){
+std::string get_current_datetime(){
     auto currentTime = std::chrono::system_clock::now();
     
     std::time_t time = std::chrono::system_clock::to_time_t(currentTime);
