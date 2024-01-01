@@ -1,5 +1,6 @@
 #include <libudev.h>
 #include <cstring>
+#include <iostream>
 
 #include "guess_input_file.h"
 
@@ -24,7 +25,7 @@ const char* guess_input_file(){
 
         const char *devnode = udev_device_get_devnode(dev);
         if (devnode && strstr(devnode, "event")) {
-            result = devnode;
+            result = strdup(devnode);
         }
 
         udev_device_unref(dev);
