@@ -6,11 +6,10 @@ add_executable(rkeylogger ${RKEYLOGGER_SOURCES})
 
 target_include_directories(rkeylogger PRIVATE 
     ${UDEV_INCLUDE_DIRS} 
-    ${XKB_INCLUDE_DIRS}
     ${RKEYLOGGER_SOURCE_DIR}/include
 )
 
-target_link_libraries(rkeylogger PRIVATE ${UDEV_LIBRARIES} ${XKB_LIBRARIES})
+target_link_libraries(rkeylogger PRIVATE ${UDEV_LIBRARIES})
 
 include(GNUInstallDirs)
 install(TARGETS rkeylogger 

