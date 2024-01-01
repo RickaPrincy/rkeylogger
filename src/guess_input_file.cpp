@@ -4,12 +4,12 @@
 
 #include "guess_input_file.h"
 
-const char* guess_input_file(){
+std::string guess_input_file(){
     struct udev *udev = udev_new();
     if (!udev) {
         return nullptr;
     }
-    const char* result = nullptr; 
+    std::string result = "";
 
     struct udev_enumerate *enumerate = udev_enumerate_new(udev);
     udev_enumerate_add_match_subsystem(enumerate, "input");
@@ -25,7 +25,7 @@ const char* guess_input_file(){
 
         const char *devnode = udev_device_get_devnode(dev);
         if (devnode && strstr(devnode, "event")) {
-            result = strdup(devnode);
+            result = devnode;
         }
 
         udev_device_unref(dev);

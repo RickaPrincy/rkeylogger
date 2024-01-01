@@ -80,6 +80,7 @@ std::unordered_map<int, KeyValue> keyboard_layout = {
     {54,    {"KEY_RIGHTSHIFT",   "KEY_RIGHTSHIFT",    "KEY_RIGHTSHIFT"}},
 
     //6th line of keyboard
+    {57,    {" ",   " ",    " "}}, //KEY_SPACE
     {100,    {"KEY_RIGHTALT",   "KEY_RIGHTALT",    "KEY_RIGHTALT"}},
 };
 
@@ -92,8 +93,8 @@ bool emit_code(int code){
 }
 
 MapSaveStatus map_code(int code, int value){
-    bool status = code == 1;
-    std::cout << "code: " << code << std::endl;
+    bool status = value == 1;
+    std::cout << "[ KEY_EVENT ]: code -> " << code << "\n";
 
     switch(code){
         case 1:
@@ -109,9 +110,10 @@ MapSaveStatus map_code(int code, int value){
             is_shift_pressed = status;
             break;
         default:
-            if(status && code != 29 && code > 1 && code <= 54)
+            if((status && code != 29 && code > 1 && code <= 54) || code == 57){
                 if(!emit_code(code))
                     return MapSaveStatus::ERROR;
+            }
             break;
     }
 
